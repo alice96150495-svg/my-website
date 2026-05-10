@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>皮拉提斯體驗課前評估問卷</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --g:#7A9E7E;--gl:#A8C5AC;--gd:#5A7E5E;
+      --cream:#F5F0E8;--rose:#C9A89A;--rosedark:#A87A6E;
+      --text:#3D3D3D;--muted:#6B6B6B;--border:#DDD5C8;
+      --warn:#E8A87C;--ok:#6BAE8A;
+    }
+    body{font-family:-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;line-height:1.6}
+
+    /* ── HEADER ── */
+    .hd{background:linear-gradient(135deg,var(--gd),var(--g));color:#fff;padding:28px 20px 24px;text-align:center}
+    .hd h1{font-size:21px;font-weight:700;letter-spacing:2px;margin-bottom:6px}
+    .hd p{font-size:13px;opacity:.85;max-width:340px;margin:0 auto}
+
+    /* ── STEPS ── */
+    .steps{display:flex;justify-content:center;align-items:center;padding:14px 0 4px;gap:0}
+    .step{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+    .sn{width:24px;height:24px;border-radius:50%;background:var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;transition:.2s}
+    .step.active .sn{background:var(--g);color:#fff}
+    .step.done .sn{background:var(--ok);color:#fff}
+    .step.done .sn::before{content:'✓'}
+    .step.done .sn span{display:none}
+    .sl{width:36px;height:2px;background:var(--border);margin:0 4px}
+    .step.done~.sl,.step.active~.sl{background:var(--gl)}
+
+    /* ── CONTAINER ── */
+    .wrap{max-width:660px;margin:0 auto;padding:16px 16px 0}
+
+    /* ── CARD ── */
+    .card{background:#fff;border-radius:16px;padding:22px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+    .ct{font-size:14px;font-weight:700;color:var(--gd);margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--gl);display:flex;align-items:center;gap:8px}
+    .ct::before{content:'';display:inline-block;width:4px;height:16px;background:var(--g);border-radius:2px}
+
+    /* ── FIELDS ── */
+    .f{margin-bottom:18px}
+    .f:last-child{margin-bottom:0}
+    label.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:7px;color:var(--text)}
+    label.lbl.req::after{content:' *';color:var(--rosedark)}
+    input[type=text],input[type=tel],input[type=number],input[type=date],input[type=time],textarea{
+      width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;
+      font-size:15px;font-family:inherit;color:var(--text);background:#FAFAF8;
+      transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+    input:focus,textarea:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3px rgba(122,158,126,.15);background:#fff}
+    textarea{resize:vertical;min-height:76px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:440px){.row2{grid-template-columns:1fr}}
+
+    /* ── OPTIONS ── */
+    .opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:7px}
+    .opts.c1{grid-template-columns:1fr}
+    .opts.c2{grid-template-columns:1fr 1fr}
+    .oi{display:flex;align-items:center;gap:7px;padding:9px 11px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;transition:.15s;background:#FAFAF8;font-size:13px}
+    .oi:hover{border-color:var(--gl);background:rgba(122,158,126,.05)}
+    .oi input{accent-color:var(--g);cursor:pointer;flex-shrink:0}
+    .oi.sel{border-color:var(--g);background:rgba(122,158,126,.1)}
+    .sub{margin-top:9px;padding-left:12px;border-left:3px solid var(--gl)}
+
+    /* ── BUTTONS ── */
+    .btn{display:block;width:100%;padding:15px;border:none;border-radius:12px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;transition:.2s;letter-spacing:1px}
+    .bp{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff}
+    .bp:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(90,126,94,.35)}
+    .bs{background:var(--cream);color:var(--gd);border:1.5px solid var(--gl)}
+    .ba{background:linear-gradient(135deg,var(--rose),var(--rosedark));color:#fff}
+    .ba:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,154,.4)}
+
+    /* ── SUCCESS ── */
+    #scr-success{display:none}
+    .bigcheck{width:68px;height:68px;background:linear-gradient(135deg,var(--gl),var(--g));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:30px;color:#fff}
+    .lbox{background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;word-break:break-all;color:var(--muted);margin:14px 0;text-align:left;max-height:72px;overflow:hidden}
+
+    /* ── STAFF BADGE / NOTICE ── */
+    #scr-staff{display:none}
+    .badge{background:linear-gradient(135deg,#5A6E8E,#3A4E6E);color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;display:inline-block;margin-bottom:10px}
+    .sumbox{background:rgba(122,158,126,.08);border:1px solid var(--gl);border-radius:12px;padding:14px;margin-bottom:14px}
+    .sg{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .si .lb{font-size:11px;color:var(--muted);margin-bottom:2px}
+    .si .vl{font-weight:600;font-size:13px}
+    .notice{padding:11px 14px;border-radius:9px;font-size:13px;margin-bottom:10px}
+    .nw{background:rgba(232,168,124,.15);border-left:4px solid var(--warn);color:#7A4A30}
+    .ni{background:rgba(122,158,126,.1);border-left:4px solid var(--g);color:var(--gd)}
+
+    /* ── BMI ── */
+    .bmibox{background:var(--cream);border-radius:10px;padding:11px 14px;margin-top:10px;display:flex;align-items:center;gap:14px}
+    .bmiv{font-size:26px;font-weight:700;color:var(--gd)}
+    .bmil{font-size:12px;color:var(--muted)}
+
+    /* ── MEASURE GRID ── */
+    .mg{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+    @media(max-width:440px){.mg{grid-template-columns:1fr 1fr}}
+    .mi label{font-size:12px;color:var(--muted);margin-bottom:4px}
+    .iu{position:relative}
+    .iu input{padding-right:36px}
+    .iu .un{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);pointer-events:none}
+
+    /* ── ANALYSIS ── */
+    #scr-analysis{display:none}
+    .atitle{font-size:15px;font-weight:700;color:var(--gd);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+    .tag{display:inline-block;padding:3px 9px;border-radius:16px;font-size:12px;font-weight:600;margin:2px}
+    .tg{background:rgba(122,158,126,.15);color:var(--gd)}
+    .tw{background:rgba(232,168,124,.2);color:#8B5E40}
+    .tb{background:rgba(90,110,142,.15);color:#3A4E6E}
+    .ritem{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--cream)}
+    .ritem:last-child{border-bottom:none}
+    .rico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
+    .rcont h4{font-size:13px;font-weight:700;margin-bottom:3px}
+    .rcont p{font-size:13px;color:var(--muted);line-height:1.5}
+    .statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+    .statbox{text-align:center}
+    .statv{font-size:22px;font-weight:700;color:var(--gd)}
+    .statl{font-size:11px;color:var(--muted)}
+    .pb32{padding-bottom:32px}
+    .hidden{display:none!important}
+    @media print{body{background:#fff}.hd{-webkit-print-color-adjust:exact;print-color-adjust:exact}.btn,.badge{display:none!important}#scr-analysis{display:block!important}#scr-staff,#scr-student{display:none!important}}
+  </style>
+</head>
+<body>
+
+<div class="hd">
+  <h1>皮拉提斯體驗課前評估</h1>
+  <p>請在課前填寫此問卷，所有資訊將嚴格保密，僅作為教學參考之用</p>
+</div>
+
+<div class="steps" id="steps">
+  <div class="step active" id="st1"><div class="sn"><span>1</span></div>學員填寫</div>
+  <div class="sl"></div>
+  <div class="step" id="st2"><div class="sn"><span>2</span></div>體態量測</div>
+  <div class="sl"></div>
+  <div class="step" id="st3"><div class="sn"><span>3</span></div>分析報告</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PHASE 1 — STUDENT FORM
+════════════════════════════════════════ -->
+<div class="wrap" id="scr-student">
+
+  <!-- 基本資料 -->
+  <div class="card">
+    <div class="ct">基本資料</div>
+    <div class="row2">
+      <div class="f">
+        <label class="lbl req" for="name">姓名</label>
+        <input type="text" id="name" placeholder="請輸入姓名">
+      </div>
+      <div class="f">
+        <label class="lbl">性別</label>
+        <div style="display:flex;gap:6px;margin-top:2px">
+          <label class="oi" style="flex:1"><input type="radio" name="gender" value="男"> 男</label>
+          <label class="oi" style="flex:1"><input type="radio" name="gender" value="女"> 女</label>
+          <label class="oi" style="flex:1"><input type="radio" name="gender" value="其他"> 其他</label>
+        </div>
+      </div>
+    </div>
+    <div class="f">
+      <label class="lbl">年齡</label>
+      <div class="opts c2">
+        <label class="oi"><input type="radio" name="age" value="20以下"> 20歲以下</label>
+        <label class="oi"><input type="radio" name="age" value="20-30"> 20–30歲</label>
+        <label class="oi"><input type="radio" name="age" value="31-40"> 31–40歲</label>
+        <label class="oi"><input type="radio" name="age" value="41-50"> 41–50歲</label>
+        <label class="oi"><input type="radio" name="age" value="51-60"> 51–60歲</label>
+        <label class="oi"><input type="radio" name="age" value="60以上"> 60歲以上</label>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="f">
+        <label class="lbl req" for="phone">聯絡電話</label>
+        <input type="tel" id="phone" placeholder="0912345678">
+      </div>
+      <div class="f">
+        <label class="lbl" for="line_email">Line ID / Email</label>
+        <input type="text" id="line_email" placeholder="Line ID 或 Email">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="f">
+        <label class="lbl" for="occupation">職業</label>
+        <input type="text" id="occupation" placeholder="請輸入職業">
+      </div>
+      <div class="f">
+        <label class="lbl">日常工作型態</label>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px">
+          <label class="oi"><input type="radio" name="work_type" value="久坐"> 久坐</label>
+          <label class="oi"><input type="radio" name="work_type" value="久站"> 久站</label>
+          <label class="oi"><input type="radio" name="work_type" value="經常走動"> 經常走動</label>
+          <label class="oi"><input type="radio" name="work_type" value="其他"> 其他</label>
+        </div>
+        <div id="work-other-sub" class="sub hidden" style="margin-top:8px">
+          <input type="text" id="work_other" placeholder="請說明工作型態">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 健康狀況 -->
+  <div class="card">
+    <div class="ct">健康狀況評估</div>
+    <div class="f">
+      <label class="lbl">1. 是否有以下任何醫療狀況？（可複選）</label>
+      <div class="opts c2">
+        <label class="oi"><input type="checkbox" name="medical" value="高血壓"> 高血壓</label>
+        <label class="oi"><input type="checkbox" name="medical" value="心臟問題"> 心臟問題</label>
+        <label class="oi"><input type="checkbox" name="medical" value="氣喘"> 氣喘</label>
+        <label class="oi"><input type="checkbox" name="medical" value="糖尿病"> 糖尿病</label>
+        <label class="oi"><input type="checkbox" name="medical" value="癲癇"> 癲癇</label>
+        <label class="oi"><input type="checkbox" name="medical" value="頭暈或平衡問題"> 頭暈/平衡問題</label>
+        <label class="oi"><input type="checkbox" name="medical" value="骨質疏鬆"> 骨質疏鬆</label>
+        <label class="oi" id="preg-oi"><input type="checkbox" name="medical" value="懷孕"> 懷孕中</label>
+        <label class="oi"><input type="checkbox" name="medical" value="其他"> 其他</label>
+        <label class="oi"><input type="checkbox" id="cb-none" value="以上皆無"> 以上皆無</label>
+      </div>
+      <div id="medical-other-sub" class="sub hidden" style="margin-top:8px">
+        <input type="text" id="medical_other" placeholder="請說明其他醫療狀況">
+      </div>
+      <div id="preg-sub" class="sub hidden" style="margin-top:8px">
+        <label class="lbl" style="font-size:12px" for="preg_weeks">懷孕週數</label>
+        <input type="number" id="preg_weeks" placeholder="週數" style="max-width:110px">
+      </div>
+    </div>
+    <div class="f">
+      <label class="lbl" for="pain_desc">2. 是否有任何身體疼痛或不適？（請簡述）</label>
+      <textarea id="pain_desc" placeholder="例如：左肩長期痠痛、腰部偶爾不舒服⋯⋯（如無請填「無」）"></textarea>
+    </div>
+    <div class="f">
+      <label class="lbl">3. 是否正在服用任何藥物？</label>
+      <div style="display:flex;gap:8px;margin-bottom:7px">
+        <label class="oi" style="flex:1"><input type="radio" name="med" value="否"> 否</label>
+        <label class="oi" style="flex:1"><input type="radio" name="med" value="是"> 是</label>
+      </div>
+      <div id="med-sub" class="sub hidden">
+        <input type="text" id="med_desc" placeholder="請列出藥物名稱">
+      </div>
+    </div>
+    <div class="f">
+      <label class="lbl">4. 是否做過手術？</label>
+      <div style="display:flex;gap:8px;margin-bottom:7px">
+        <label class="oi" style="flex:1"><input type="radio" name="surg" value="否"> 否</label>
+        <label class="oi" style="flex:1"><input type="radio" name="surg" value="是"> 是</label>
+      </div>
+      <div id="surg-sub" class="sub hidden">
+        <input type="text" id="surg_desc" placeholder="請簡述手術部位及時間">
+      </div>
+    </div>
+  </div>
+
+  <!-- 運動與經驗 -->
+  <div class="card">
+    <div class="ct">運動與皮拉提斯經驗</div>
+    <div class="f">
+      <label class="lbl">5. 平均每週運動頻率？</label>
+      <div class="opts c2">
+        <label class="oi"><input type="radio" name="exfreq" value="不運動"> 不運動</label>
+        <label class="oi"><input type="radio" name="exfreq" value="1-2次"> 1–2 次</label>
+        <label class="oi"><input type="radio" name="exfreq" value="3-4次"> 3–4 次</label>
+        <label class="oi"><input type="radio" name="exfreq" value="5次以上"> 5 次以上</label>
+      </div>
+      <div class="sub" style="margin-top:9px">
+        <input type="text" id="ex_type" placeholder="運動類型（例如：瑜伽、慢跑、重訓）">
+      </div>
+    </div>
+    <div class="f">
+      <label class="lbl">6. 是否有皮拉提斯經驗？</label>
+      <div class="opts c2">
+        <label class="oi"><input type="radio" name="plexp" value="無經驗"> 無經驗</label>
+        <label class="oi"><input type="radio" name="plexp" value="少於3個月"> 少於 3 個月</label>
+        <label class="oi"><input type="radio" name="plexp" value="3-12個月"> 3–12 個月</label>
+        <label class="oi"><input type="radio" name="plexp" value="1年以上"> 1 年以上</label>
+      </div>
+      <div class="sub" style="margin-top:9px">
+        <label class="lbl" style="font-size:12px">曾上過的課程類型</label>
+        <div class="opts c2" style="margin-top:5px">
+          <label class="oi"><input type="checkbox" name="pltype" value="墊上"> 墊上課程</label>
+          <label class="oi"><input type="checkbox" name="pltype" value="器械一對一"> 器械一對一</label>
+          <label class="oi"><input type="checkbox" name="pltype" value="團體課"> 團體課</label>
+          <label class="oi"><input type="checkbox" name="pltype" value="線上課程"> 線上課程</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 目標 -->
+  <div class="card">
+    <div class="ct">上課目標與期待</div>
+    <div class="f">
+      <label class="lbl">7. 最希望達成什麼目標？（可複選）</label>
+      <div class="opts c2">
+        <label class="oi"><input type="checkbox" name="goal" value="改善姿勢體態"> 改善姿勢體態</label>
+        <label class="oi"><input type="checkbox" name="goal" value="增強核心力量"> 增強核心力量</label>
+        <label class="oi"><input type="checkbox" name="goal" value="舒緩疼痛不適"> 舒緩疼痛不適</label>
+        <label class="oi"><input type="checkbox" name="goal" value="增加柔軟度"> 增加柔軟度</label>
+        <label class="oi"><input type="checkbox" name="goal" value="恢復受傷部位"> 恢復受傷部位</label>
+        <label class="oi"><input type="checkbox" name="goal" value="提升整體健康"> 提升整體健康</label>
+        <label class="oi"><input type="checkbox" name="goal" value="塑身"> 塑身</label>
+        <label class="oi"><input type="checkbox" name="goal" value="紓壓放鬆"> 紓壓放鬆</label>
+        <label class="oi"><input type="checkbox" name="goal" value="加強運動表現"> 加強運動表現</label>
+        <label class="oi"><input type="checkbox" name="goal" value="產後修復"> 產後修復</label>
+      </div>
+      <div class="sub" style="margin-top:9px">
+        <input type="text" id="goal_area" placeholder="特別想加強的身體部位或動作">
+      </div>
+    </div>
+    <div class="f">
+      <label class="lbl">8. 偏好的訓練強度？</label>
+      <div class="opts c1">
+        <label class="oi"><input type="radio" name="intensity" value="輕度"> 輕度，著重放鬆與伸展</label>
+        <label class="oi"><input type="radio" name="intensity" value="中度"> 中度，平衡訓練與放鬆</label>
+        <label class="oi"><input type="radio" name="intensity" value="高度"> 高度，喜歡挑戰、想快速進步</label>
+      </div>
+    </div>
+    <div class="f">
+      <label class="lbl" for="other_info">9. 想告訴教練的其他資訊</label>
+      <textarea id="other_info" placeholder="例如：希望有伸展、我很容易腰痠、有特別在意的部位⋯⋯"></textarea>
+    </div>
+  </div>
+
+  <!-- 時段 -->
+  <div class="card">
+    <div class="ct">課程安排偏好</div>
+    <div class="f">
+      <label class="lbl">偏好的上課時段（可複選）</label>
+      <div class="opts">
+        <label class="oi"><input type="checkbox" name="sch" value="平日早上"> 平日早上</label>
+        <label class="oi"><input type="checkbox" name="sch" value="平日中午"> 平日中午</label>
+        <label class="oi"><input type="checkbox" name="sch" value="平日下午"> 平日下午</label>
+        <label class="oi"><input type="checkbox" name="sch" value="平日晚上"> 平日晚上</label>
+        <label class="oi"><input type="checkbox" name="sch" value="週末"> 週末</label>
+      </div>
+    </div>
+    <div class="f">
+      <label class="lbl">您如何得知我們的課程？（可複選）</label>
+      <div class="opts c2">
+        <label class="oi"><input type="checkbox" name="src" value="朋友介紹"> 朋友介紹</label>
+        <label class="oi"><input type="checkbox" name="src" value="社群媒體"> 社群媒體</label>
+        <label class="oi"><input type="checkbox" name="src" value="Google搜尋"> Google 搜尋</label>
+        <label class="oi"><input type="checkbox" name="src" value="其他"> 其他</label>
+      </div>
+      <div id="src-other-sub" class="sub hidden" style="margin-top:8px">
+        <input type="text" id="src_other" placeholder="請說明其他來源">
+      </div>
+    </div>
+  </div>
+
+  <div class="pb32">
+    <button class="btn bp" onclick="submitStudent()">提交問卷 ✓</button>
+  </div>
+</div><!-- /scr-student -->
+
+<!-- ════════════════════════════════════════
+     SUCCESS SCREEN
+════════════════════════════════════════ -->
+<div class="wrap" id="scr-success" style="display:none">
+  <div class="card" style="text-align:center;padding:30px 22px">
+    <div class="bigcheck">✓</div>
+    <h2 style="font-size:19px;font-weight:700;margin-bottom:6px;color:var(--gd)">問卷填寫完成！</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px">請把手機螢幕給前台掃描，或傳連結給教練</p>
+
+    <!-- 主要按鈕：直接進入教練模式 -->
+    <button class="btn ba" onclick="goToStaff()" style="font-size:17px;padding:18px;margin-bottom:16px">
+      📋 教練點這裡 → 開始量測
+    </button>
+
+    <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">或透過以下方式傳給教練</p>
+
+      <!-- QR Code -->
+      <div style="display:flex;justify-content:center;margin-bottom:12px">
+        <div style="background:#fff;padding:10px;border-radius:12px;border:1.5px solid var(--gl);display:inline-block">
+          <img id="qr-img" src="" alt="QR Code" style="width:150px;height:150px;display:block"
+               onerror="this.style.display='none';document.getElementById('qr-fallback').style.display='block'">
+          <div id="qr-fallback" style="display:none;width:150px;height:150px;background:var(--cream);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);text-align:center;padding:10px">需連網才能顯示 QR Code</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:9px">
+        <button class="btn bp" onclick="copyLink()" style="flex:1;font-size:14px">複製連結</button>
+        <button class="btn bs" onclick="shareToLine()" style="flex:1;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px">
+          <span>💬</span> LINE
+        </button>
+      </div>
+      <div class="lbox" id="link-display" style="margin-top:10px;font-size:11px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PHASE 2 — STAFF SECTION
+════════════════════════════════════════ -->
+<div class="wrap" id="scr-staff">
+
+  <!-- 學員摘要 -->
+  <div class="card">
+    <span class="badge">教練 / 業務專用</span>
+    <div class="ct">學員資料摘要</div>
+    <div class="sumbox" id="sum-box"></div>
+    <div id="health-warn"></div>
+  </div>
+
+  <!-- 體態量測 -->
+  <div class="card">
+    <div class="ct">現場體態量測</div>
+    <div class="mg">
+      <div class="mi f">
+        <label class="lbl" style="font-size:12px">身高</label>
+        <div class="iu"><input type="number" id="height" placeholder="160" oninput="calcBMI()"><span class="un">cm</span></div>
+      </div>
+      <div class="mi f">
+        <label class="lbl" style="font-size:12px">體重</label>
+        <div class="iu"><input type="number" id="weight" placeholder="55" oninput="calcBMI()"><span class="un">kg</span></div>
+      </div>
+      <div class="mi f">
+        <label class="lbl" style="font-size:12px">體脂率</label>
+        <div class="iu"><input type="number" id="body_fat" placeholder="25"><span class="un">%</span></div>
+      </div>
+      <div class="mi f">
+        <label class="lbl" style="font-size:12px">腰圍</label>
+        <div class="iu"><input type="number" id="waist" placeholder="70"><span class="un">cm</span></div>
+      </div>
+      <div class="mi f">
+        <label class="lbl" style="font-size:12px">臀圍</label>
+        <div class="iu"><input type="number" id="hip" placeholder="92"><span class="un">cm</span></div>
+      </div>
+      <div class="mi f">
+        <label class="lbl" style="font-size:12px">肌肉量</label>
+        <div class="iu"><input type="number" id="muscle" placeholder="40"><span class="un">kg</span></div>
+      </div>
+    </div>
+    <div id="bmi-box" class="bmibox hidden">
+      <div>
+        <div style="font-size:11px;color:var(--muted)">BMI 指數</div>
+        <div class="bmiv" id="bmi-val">--</div>
+      </div>
+      <div>
+        <div id="bmi-cat" style="font-weight:700;font-size:14px"></div>
+        <div id="bmi-note" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 姿勢評估 -->
+  <div class="card">
+    <div class="ct">姿勢評估（現場觀察）</div>
+    <div class="f">
+      <label class="lbl">觀察到的姿勢問題（可複選）</label>
+      <div class="opts c2">
+        <label class="oi"><input type="checkbox" name="posture" value="頭前傾"> 頭前傾</label>
+        <label class="oi"><input type="checkbox" name="posture" value="圓肩"> 圓肩</label>
+        <label class="oi"><input type="checkbox" name="posture" value="駝背"> 駝背</label>
+        <label class="oi"><input type="checkbox" name="posture" value="骨盆前傾"> 骨盆前傾</label>
+        <label class="oi"><input type="checkbox" name="posture" value="骨盆後傾"> 骨盆後傾</label>
+        <label class="oi"><input type="checkbox" name="posture" value="脊椎側彎"> 脊椎側彎</label>
+        <label class="oi"><input type="checkbox" name="posture" value="膝超伸"> 膝超伸</label>
+        <label class="oi"><input type="checkbox" name="posture" value="足弓塌陷"> 足弓塌陷</label>
+      </div>
+    </div>
+    <div class="f">
+      <label class="lbl" for="posture_notes">姿勢評估備注</label>
+      <textarea id="posture_notes" placeholder="教練對體態的觀察與備注⋯⋯"></textarea>
+    </div>
+  </div>
+
+  <!-- 課程安排 -->
+  <div class="card">
+    <div class="ct">課程安排（教練填寫）</div>
+    <div class="row2">
+      <div class="f">
+        <label class="lbl" for="bk_date">預約日期</label>
+        <input type="date" id="bk_date">
+      </div>
+      <div class="f">
+        <label class="lbl" for="bk_time">預約時間</label>
+        <input type="time" id="bk_time">
+      </div>
+    </div>
+    <div class="f">
+      <label class="lbl" for="course_type">課程類型</label>
+      <input type="text" id="course_type" placeholder="例如：器械一對一體驗課">
+    </div>
+    <div class="f">
+      <label class="lbl" for="staff_notes">教練備注</label>
+      <textarea id="staff_notes" placeholder="課程規劃、特別注意事項⋯⋯"></textarea>
+    </div>
+  </div>
+
+  <div class="pb32">
+    <button class="btn ba" onclick="generateReport()">生成分析報告 →</button>
+  </div>
+</div><!-- /scr-staff -->
+
+<!-- ════════════════════════════════════════
+     PHASE 3 — ANALYSIS REPORT
+════════════════════════════════════════ -->
+<div class="wrap" id="scr-analysis">
+  <div class="card">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">個人化評估報告</div>
+        <h2 style="font-size:19px;font-weight:700" id="rpt-name"></h2>
+      </div>
+      <div style="text-align:right;font-size:11px;color:var(--muted)" id="rpt-date"></div>
+    </div>
+    <div id="rpt-content"></div>
+  </div>
+  <div style="display:flex;gap:9px" class="pb32">
+    <button class="btn bs" onclick="window.print()" style="flex:1">列印報告</button>
+    <button class="btn bp" onclick="saveReport()" style="flex:1">儲存 &amp; 複製連結</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<div style="text-align:center;padding:28px 20px 36px;background:#fff;margin-top:8px;border-top:1px solid var(--border)">
+  <div style="font-size:12px;color:var(--muted);margin-bottom:14px;letter-spacing:1px">關注我們</div>
+  <div style="display:inline-block;background:#fff;padding:10px;border-radius:14px;border:2px solid var(--gl)">
+    <img
+      src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=0&data=https://linktr.ee/yusiyoga"
+      alt="昀姿瑜伽 QR Code"
+      style="width:140px;height:140px;display:block"
+    >
+  </div>
+  <div style="margin-top:12px">
+    <a href="https://linktr.ee/yusiyoga" target="_blank"
+       style="color:var(--gd);font-size:14px;font-weight:600;text-decoration:none;letter-spacing:0.5px">
+      linktr.ee/yusiyoga
+    </a>
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-top:5px">掃描 QR Code 查看更多資訊</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════ -->
+<script>
+// ★ 部署 Apps Script 後，把網址貼在這裡 ★
+var APPS_URL = '請貼上你的 Apps Script 網址';
+
+var SD=null,SF=null;
+
+// ─── INIT ──────────────────────────────────
+window.addEventListener('DOMContentLoaded',function(){
+  var h=window.location.hash;
+  if(h.startsWith('#report=')){
+    try{
+      var full=JSON.parse(dec(h.slice(8)));
+      SD=full.student; SF=full.staff;
+      renderReport();
+    }catch(e){showStudent();}
+    return;
+  }
+  if(h.startsWith('#data=')){
+    try{
+      SD=JSON.parse(dec(h.slice(6)));
+      showStaff();
+    }catch(e){showStudent();}
+    return;
+  }
+  showStudent();
+  setupLogic();
+  setupHighlight();
+});
+
+function enc(s){return btoa(unescape(encodeURIComponent(s)))}
+function dec(s){return decodeURIComponent(escape(atob(s)))}
+
+// ─── SCREEN HELPERS ────────────────────────
+function showStudent(){
+  document.getElementById('scr-student').style.display='';
+  setStep(1);
+}
+function showStaff(){
+  hide('scr-student');hide('scr-success');
+  document.getElementById('scr-staff').style.display='';
+  setStep(2);
+  fillSummary();
+}
+function hide(id){document.getElementById(id).style.display='none'}
+
+function setStep(n){
+  for(var i=1;i<=3;i++){
+    var el=document.getElementById('st'+i);
+    el.classList.remove('active','done');
+    if(i<n) el.classList.add('done');
+    else if(i===n) el.classList.add('active');
+  }
+}
+
+// ─── CONDITIONAL FIELDS ────────────────────
+function setupLogic(){
+  // 工作型態「其他」
+  q('input[name="work_type"]').forEach(function(r){
+    r.addEventListener('change',function(){
+      tog('work-other-sub', r.value==='其他'&&r.checked);
+    });
+  });
+  // 醫療狀況「其他」
+  var medOther=document.querySelector('input[name="medical"][value="其他"]');
+  if(medOther) medOther.addEventListener('change',function(){tog('medical-other-sub',this.checked);});
+  // 來源「其他」
+  var srcOther=document.querySelector('input[name="src"][value="其他"]');
+  if(srcOther) srcOther.addEventListener('change',function(){tog('src-other-sub',this.checked);});
+
+  q('input[name="med"]').forEach(function(r){
+    r.addEventListener('change',function(){
+      tog('med-sub', r.value==='是'&&r.checked);
+    });
+  });
+  q('input[name="surg"]').forEach(function(r){
+    r.addEventListener('change',function(){
+      tog('surg-sub', r.value==='是'&&r.checked);
+    });
+  });
+  var pregCb=document.querySelector('input[value="懷孕"]');
+  if(pregCb) pregCb.addEventListener('change',function(){tog('preg-sub',this.checked)});
+  var none=document.getElementById('cb-none');
+  if(none){
+    none.addEventListener('change',function(){
+      if(this.checked) q('input[name="medical"]').forEach(function(c){if(c!==none)c.checked=false;});
+    });
+    q('input[name="medical"]').forEach(function(c){
+      if(c.id!=='cb-none') c.addEventListener('change',function(){if(c.checked)none.checked=false;});
+    });
+  }
+}
+function tog(id,show){
+  var el=document.getElementById(id);
+  if(el) show?el.classList.remove('hidden'):el.classList.add('hidden');
+}
+function q(sel){return Array.from(document.querySelectorAll(sel))}
+
+// ─── OPTION HIGHLIGHT ──────────────────────
+function setupHighlight(){
+  q('.oi input').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      if(inp.type==='radio'){
+        q('input[name="'+inp.name+'"]').forEach(function(i){
+          i.closest('.oi').classList.toggle('sel',i.checked);
+        });
+      } else {
+        inp.closest('.oi').classList.toggle('sel',inp.checked);
+      }
+    });
+  });
+}
+
+// ─── COLLECT DATA ──────────────────────────
+function gv(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+function gr(name){var e=document.querySelector('input[name="'+name+'"]:checked');return e?e.value:'';}
+function gcb(name){return q('input[name="'+name+'"]:checked').map(function(e){return e.value;});}
+
+function collectStudent(){
+  return{
+    name:gv('name'),gender:gr('gender'),age:gr('age'),
+    phone:gv('phone'),line_email:gv('line_email'),
+    occupation:gv('occupation'),work_type:gr('work_type'),
+    medical:gcb('medical'),preg_weeks:gv('preg_weeks'),medical_other:gv('medical_other'),
+    pain_desc:gv('pain_desc'),
+    med:gr('med'),med_desc:gv('med_desc'),
+    surg:gr('surg'),surg_desc:gv('surg_desc'),
+    exfreq:gr('exfreq'),ex_type:gv('ex_type'),
+    plexp:gr('plexp'),pltype:gcb('pltype'),
+    goal:gcb('goal'),goal_area:gv('goal_area'),
+    intensity:gr('intensity'),other_info:gv('other_info'),
+    sch:gcb('sch'),src:gcb('src'),src_other:gv('src_other'),
+    work_other:gv('work_other'),
+    at:new Date().toISOString()
+  };
+}
+function collectStaff(){
+  return{
+    height:gv('height'),weight:gv('weight'),body_fat:gv('body_fat'),
+    waist:gv('waist'),hip:gv('hip'),muscle:gv('muscle'),
+    posture:gcb('posture'),posture_notes:gv('posture_notes'),
+    bk_date:gv('bk_date'),bk_time:gv('bk_time'),
+    course_type:gv('course_type'),staff_notes:gv('staff_notes')
+  };
+}
+
+// ─── 傳送到 Google Sheets ──────────────────
+function postToSheet(payload){
+  if(!APPS_URL||APPS_URL.indexOf('請貼上')!==-1) return;
+  fetch(APPS_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).catch(function(){});
+}
+
+// ─── SUBMIT STUDENT ────────────────────────
+function submitStudent(){
+  var d=collectStudent();
+  if(!d.name||!d.phone){alert('請填寫姓名和聯絡電話');return;}
+  // 產生唯一 ID（時間戳 + 隨機碼）
+  d.id=Date.now()+'-'+Math.random().toString(36).slice(2,6);
+  SD=d;
+  // 傳送學員資料到 Google Sheets
+  postToSheet(Object.assign({type:'student'},d));
+  var url=baseURL()+'#data='+enc(JSON.stringify(d));
+  hide('scr-student');
+  document.getElementById('scr-success').style.display='';
+  document.getElementById('link-display').textContent=url;
+  // 產生 QR Code
+  document.getElementById('qr-img').src=
+    'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=0&data='+encodeURIComponent(url);
+  window.history.replaceState(null,'',url);
+  setStep(2);
+}
+function baseURL(){return window.location.href.split('#')[0];}
+
+function copyLink(){
+  var link=document.getElementById('link-display').textContent;
+  navigator.clipboard.writeText(link).then(function(){
+    var btn=event.target,orig=btn.textContent;
+    btn.textContent='已複製 ✓';
+    setTimeout(function(){btn.textContent=orig;},2000);
+  });
+}
+function shareToLine(){
+  var link=document.getElementById('link-display').textContent;
+  window.open('https://line.me/R/msg/text/?'+encodeURIComponent('皮拉提斯體驗課前評估問卷\n'+link));
+}
+function goToStaff(){
+  hide('scr-success');
+  showStaff();
+}
+
+// ─── FILL SUMMARY ──────────────────────────
+function fillSummary(){
+  if(!SD) return;
+  var d=SD;
+  var warns=[];
+  var m=d.medical||[];
+  if(m.length&&!m.includes('以上皆無')) warns=warns.concat(m);
+  if(d.med==='是') warns.push('服用藥物');
+  if(d.surg==='是') warns.push('有手術史');
+
+  document.getElementById('sum-box').innerHTML=
+    '<div class="sg">'+
+      si('姓名',d.name||'--')+
+      si('性別/年齡',(d.gender||'--')+' / '+(d.age||'--'))+
+      si('電話',d.phone||'--')+
+      si('皮拉提斯經驗',d.plexp||'無經驗')+
+      '<div class="si" style="grid-column:span 2">'+
+        '<div class="lb">目標</div>'+
+        '<div class="vl" style="font-size:12px">'+(d.goal&&d.goal.length?d.goal.join(' · '):'--')+'</div>'+
+      '</div>'+
+      si('偏好強度',d.intensity||'--')+
+      si('工作型態',d.work_type||'--')+
+      (d.pain_desc&&d.pain_desc!=='無'?
+        '<div class="si" style="grid-column:span 2"><div class="lb">疼痛/不適</div><div class="vl" style="font-size:12px;color:var(--rosedark)">'+d.pain_desc+'</div></div>':'')+
+    '</div>';
+
+  var wEl=document.getElementById('health-warn');
+  if(warns.length){
+    var extra='';
+    if(d.med_desc) extra+='<br>藥物：'+d.med_desc;
+    if(d.surg_desc) extra+='<br>手術：'+d.surg_desc;
+    wEl.innerHTML='<div class="notice nw">⚠️ 健康注意：'+warns.map(function(w){return'<strong>'+w+'</strong>';}).join('、')+extra+'</div>';
+  } else {
+    wEl.innerHTML='';
+  }
+}
+function si(l,v){return'<div class="si"><div class="lb">'+l+'</div><div class="vl">'+v+'</div></div>';}
+
+// ─── BMI ───────────────────────────────────
+function calcBMI(){
+  var h=parseFloat(gv('height')),w=parseFloat(gv('weight'));
+  if(h>0&&w>0){
+    var b=(w/Math.pow(h/100,2)).toFixed(1);
+    document.getElementById('bmi-box').classList.remove('hidden');
+    document.getElementById('bmi-val').textContent=b;
+    var cat,note,clr;
+    if(b<18.5){cat='體重過輕';note='建議增加肌肉訓練';clr='#5A8EAE';}
+    else if(b<24){cat='正常體重';note='體重狀況良好';clr='var(--ok)';}
+    else if(b<27){cat='體重過重';note='適合加強核心與有氧';clr='var(--warn)';}
+    else if(b<30){cat='輕度肥胖';note='建議搭配飲食調整';clr='#E87A5A';}
+    else{cat='中重度肥胖';note='注意關節負擔，循序漸進';clr='#C04A3A';}
+    var c=document.getElementById('bmi-cat');
+    c.textContent=cat; c.style.color=clr;
+    document.getElementById('bmi-note').textContent=note;
+  }
+}
+
+// ─── GENERATE REPORT ───────────────────────
+function generateReport(){
+  SF=collectStaff();
+  // 傳送教練體態數據到 Google Sheets（更新同一列）
+  if(SD&&SD.id) postToSheet(Object.assign({type:'staff',id:SD.id},SF));
+  setStep(3);
+  renderReport();
+  hide('scr-staff');
+  document.getElementById('scr-analysis').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderReport(){
+  if(!SD) return;
+  var d=SD,s=SF||{};
+  var now=new Date();
+  document.getElementById('rpt-name').textContent=d.name+' 的評估報告';
+  document.getElementById('rpt-date').innerHTML='評估日期<br>'+now.getFullYear()+'/'+(now.getMonth()+1)+'/'+now.getDate();
+
+  var html='';
+
+  // 體態數據
+  if(s.height||s.weight){
+    var bmi=s.height&&s.weight?(parseFloat(s.weight)/Math.pow(parseFloat(s.height)/100,2)).toFixed(1):null;
+    html+='<div style="background:var(--cream);border-radius:12px;padding:14px;margin-bottom:18px">'+
+      '<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:10px">體態數據</div>'+
+      '<div class="statgrid">'+
+      (s.height?sbox(s.height,'身高 cm'):'')+
+      (s.weight?sbox(s.weight,'體重 kg'):'')+
+      (bmi?sbox(bmi,'BMI'):'')+
+      (s.body_fat?sbox(s.body_fat+'%','體脂率'):'')+
+      (s.waist?sbox(s.waist,'腰圍 cm'):'')+
+      (s.hip?sbox(s.hip,'臀圍 cm'):'')+
+      '</div></div>';
+  }
+
+  // 目標
+  if(d.goal&&d.goal.length){
+    html+='<div style="margin-bottom:18px"><div class="atitle">🎯 目標規劃</div>'+
+      d.goal.map(function(g){return '<span class="tag tg">'+g+'</span>';}).join('')+
+      (d.goal_area?'<div style="font-size:12px;color:var(--muted);margin-top:7px">特別加強：'+d.goal_area+'</div>':'')+
+      '<div style="margin-top:12px;border:1px solid var(--border);border-radius:11px;padding:4px 14px">'+
+      goalRecs(d,s)+'</div></div>';
+  }
+
+  // 健康警示
+  var hw=healthWarns(d);
+  if(hw.length){
+    html+='<div style="margin-bottom:18px"><div class="atitle">⚕️ 健康注意事項</div>'+
+      hw.map(function(w){return'<div class="notice nw" style="margin-bottom:7px">'+w+'</div>';}).join('')+
+      '</div>';
+  }
+
+  // 姿勢評估
+  if(s.posture&&s.posture.length){
+    html+='<div style="margin-bottom:18px"><div class="atitle">🧘 姿勢評估結果</div>'+
+      s.posture.map(function(p){return'<span class="tag tw">'+p+'</span>';}).join('')+
+      postureRecs(s.posture)+
+      (s.posture_notes?'<div style="font-size:13px;color:var(--muted);margin-top:9px;padding:10px;background:var(--cream);border-radius:8px">備注：'+s.posture_notes+'</div>':'')+
+      '</div>';
+  }
+
+  // 課程建議
+  html+='<div style="margin-bottom:18px"><div class="atitle">📋 課程建議</div>'+courseRec(d,s)+'</div>';
+
+  // 預約
+  if(s.bk_date||s.bk_time||s.course_type){
+    html+='<div style="background:rgba(122,158,126,.1);border:1px solid var(--gl);border-radius:12px;padding:14px;margin-bottom:18px">'+
+      '<div style="font-size:12px;font-weight:700;color:var(--gd);margin-bottom:8px">預約資訊</div>'+
+      '<div style="font-size:14px">'+
+      (s.bk_date?'📅 '+s.bk_date+' ':'')+
+      (s.bk_time?s.bk_time:'')+
+      (s.course_type?'<br>📌 '+s.course_type:'')+
+      '</div>'+
+      (s.staff_notes?'<div style="font-size:12px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">'+s.staff_notes+'</div>':'')+
+      '</div>';
+  }
+
+  document.getElementById('rpt-content').innerHTML=html;
+  document.getElementById('scr-analysis').style.display='';
+  setStep(3);
+}
+
+function sbox(v,l){
+  return'<div class="statbox"><div class="statv">'+v+'</div><div class="statl">'+l+'</div></div>';
+}
+
+// ─── RECOMMENDATION BUILDERS ───────────────
+var GOAL_MAP={
+  '改善姿勢體態':{i:'🏛️',c:'#E8F0E8',t:'加強核心穩定與脊椎延展訓練，搭配胸椎活動度練習，建立正確的身體排列習慣'},
+  '增強核心力量':{i:'💪',c:'#F0E8E8',t:'從深層腹橫肌啟動開始，循序漸進提升核心耐力，搭配呼吸訓練'},
+  '舒緩疼痛不適':{i:'🌿',c:'#E8EEF5',t:'透過肌肉平衡訓練改善代償模式，建議先評估疼痛來源再規劃訓練方向'},
+  '增加柔軟度':{i:'🤸',c:'#F5EEE8',t:'結合動態伸展與靜態放鬆，重點改善髖屈肌、胸椎旋轉及肩關節活動度'},
+  '塑身':{i:'✨',c:'#EEE8F5',t:'皮拉提斯能有效提升肌肉線條，建議搭配有氧訓練提升代謝，重點加強核心與臀腿'},
+  '紓壓放鬆':{i:'🧘',c:'#E8F5EE',t:'以呼吸為導向的練習能有效降低壓力荷爾蒙，建議注重呼吸品質與流動感'},
+  '恢復受傷部位':{i:'🩹',c:'#FFF0E8',t:'針對受傷部位制定漸進式復健計畫，加強周邊肌群穩定度，避免代償'},
+  '提升整體健康':{i:'💚',c:'#E8F5F0',t:'皮拉提斯全面改善心肺、肌力、柔軟度與平衡，建議持續規律練習'},
+  '加強運動表現':{i:'🏃',c:'#E8EAF5',t:'強化核心穩定與動作控制，提升運動效率，減少運動傷害風險'},
+  '產後修復':{i:'🌸',c:'#F5E8EE',t:'建議從骨盆底肌修復開始，確認腹直肌分離狀況，循序漸進加強核心'}
+};
+function goalRecs(d){
+  return (d.goal||[]).filter(function(g){return GOAL_MAP[g];}).map(function(g){
+    var r=GOAL_MAP[g];
+    return'<div class="ritem"><div class="rico" style="background:'+r.c+'">'+r.i+'</div>'+
+      '<div class="rcont"><h4>'+g+'</h4><p>'+r.t+'</p></div></div>';
+  }).join('');
+}
+
+var POSTURE_MAP={
+  '頭前傾':'加強頸部深層屈肌，改善頸胸段活動度',
+  '圓肩':'強化菱形肌與下斜方肌，放鬆胸小肌',
+  '駝背':'加強胸椎伸展與後側肌群，訓練脊椎延展意識',
+  '骨盆前傾':'強化腹部深層核心，放鬆髖屈肌，改善腰椎過度前凸',
+  '骨盆後傾':'訓練骨盆中立穩定，加強臀部啟動與髖伸展',
+  '脊椎側彎':'著重對稱性訓練，加強側向穩定肌群，注意動作代償',
+  '膝超伸':'強化股四頭肌離心控制，改善膝關節本體感覺',
+  '足弓塌陷':'訓練足底內在肌群，加強足踝穩定度'
+};
+function postureRecs(ps){
+  var items=ps.filter(function(p){return POSTURE_MAP[p];});
+  if(!items.length) return '';
+  return'<div style="font-size:13px;margin-top:12px">'+
+    '<div style="font-weight:700;margin-bottom:7px">針對性訓練建議</div>'+
+    items.map(function(p){
+      return'<div style="padding:7px 11px;margin-bottom:5px;background:var(--cream);border-radius:8px">'+
+        '<strong style="color:var(--rosedark)">'+p+'</strong>：'+POSTURE_MAP[p]+'</div>';
+    }).join('')+'</div>';
+}
+
+function courseRec(d,s){
+  var exp=d.plexp,lv='',fmt='',notes=[];
+  if(!exp||exp==='無經驗'||exp==='少於3個月'){
+    lv='初學者課程';fmt='建議從器械一對一或小班制開始，確保動作基礎正確';
+  }else if(exp==='3-12個月'){
+    lv='進階入門課程';fmt='可嘗試小班團體課，同時繼續精進基礎動作品質';
+  }else{
+    lv='進階課程';fmt='可挑戰更多元的動作變化，加入進階器械課程';
+  }
+  var med=d.medical||[];
+  var hasH=med.length&&!med.includes('以上皆無');
+  if(d.intensity==='輕度'||hasH) notes.push('以放鬆、伸展、呼吸為主軸，強度循序漸進');
+  if(d.intensity==='高度'&&!hasH) notes.push('可加入挑戰性動作序列，建立清晰的訓練進程');
+  if(d.sch&&d.sch.length) notes.push('偏好時段：'+d.sch.join('、'));
+  return'<div style="padding:14px;background:var(--cream);border-radius:11px">'+
+    '<div style="margin-bottom:8px">'+
+    '<span class="tag tb">'+lv+'</span>'+
+    (d.intensity?'<span class="tag tg">'+d.intensity+'強度</span>':'')+
+    '</div>'+
+    '<p style="font-size:14px;margin-bottom:7px">'+fmt+'</p>'+
+    notes.map(function(n){return'<p style="font-size:13px;color:var(--muted)">· '+n+'</p>';}).join('')+
+    '</div>';
+}
+
+var HEALTH_WARN_MAP={
+  '高血壓':'避免憋氣動作，注意頭低腳高的倒置動作，強調呼吸協調',
+  '心臟問題':'請先取得醫生許可，初期以低強度為主，全程監測學員狀態',
+  '氣喘':'確認學員攜帶吸入器，避免過度換氣，注意空調溫度',
+  '糖尿病':'課前確認血糖值，準備緊急糖分補充，避免空腹高強度訓練',
+  '癲癇':'確認最近一次發作時間，注意頭部動作，告知緊急處理流程',
+  '頭暈或平衡問題':'避免快速起身，所有動作緩慢轉換，提供充足支撐',
+  '骨質疏鬆':'避免脊椎屈曲動作，禁止高衝擊，強調垂直負重與平衡訓練',
+  '懷孕':'避免仰臥動作（12週後），專注骨盆底肌訓練，全程溫和進行'
+};
+function healthWarns(d){
+  var out=[];
+  (d.medical||[]).filter(function(m){return HEALTH_WARN_MAP[m];}).forEach(function(m){
+    var w='<strong>'+m+'</strong>：'+HEALTH_WARN_MAP[m];
+    if(m==='懷孕'&&d.preg_weeks) w='<strong>懷孕 '+d.preg_weeks+' 週</strong>：'+HEALTH_WARN_MAP[m];
+    out.push(w);
+  });
+  if(d.med==='是'&&d.med_desc) out.push('<strong>藥物使用</strong>：'+d.med_desc+' — 請了解藥物對運動的影響');
+  if(d.surg==='是'&&d.surg_desc) out.push('<strong>手術史</strong>：'+d.surg_desc+' — 確認恢復狀況，避免壓迫手術部位');
+  return out;
+}
+
+// ─── SAVE ──────────────────────────────────
+function saveReport(){
+  var full={student:SD,staff:SF,at:new Date().toISOString()};
+  var url=baseURL()+'#report='+enc(JSON.stringify(full));
+  window.history.replaceState(null,'',url);
+  navigator.clipboard.writeText(url).then(function(){
+    alert('報告連結已複製！可傳送給學員查看');
+  }).catch(function(){
+    alert('報告已儲存，請複製瀏覽器網址列的連結');
+  });
+}
+</script>
+</body>
+</html>
