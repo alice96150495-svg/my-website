@@ -601,18 +601,15 @@
   </div>
   <div style="background:rgba(122,158,126,.08);border:1px solid var(--gl);border-radius:14px;padding:16px;margin-bottom:14px">
     <div style="font-size:12px;font-weight:700;color:var(--gd);margin-bottom:12px;letter-spacing:.5px">📤 傳送報告給學員</div>
+    <button onclick="shareReportLine()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;border:none;border-radius:12px;background:#06C755;color:#fff;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:1px;margin-bottom:9px;transition:.2s" onmouseover="this.style.background='#05B04C'" onmouseout="this.style.background='#06C755'">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.03 2 11c0 3.07 1.62 5.78 4.1 7.47V21l2.8-1.55c.95.26 1.96.4 3.1.4 5.52 0 10-4.03 10-9S17.52 2 12 2z"/></svg>
+      傳送報告給學員（LINE）
+    </button>
     <div style="display:flex;gap:9px;margin-bottom:10px">
-      <button class="btn ba" onclick="shareReportLine()" style="flex:1;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px">
-        <span>💬</span> LINE 傳給學員
-      </button>
-      <button class="btn bp" onclick="copyReportLink()" style="flex:1;font-size:14px" id="copy-rpt-btn">
-        複製連結
-      </button>
+      <button class="btn bp" onclick="copyReportLink()" style="flex:1;font-size:13px" id="copy-rpt-btn">📋 複製報告連結</button>
+      <button class="btn bs" onclick="window.print()" style="flex:1;font-size:13px">🖨 列印 / PDF</button>
     </div>
-    <p style="font-size:11px;color:var(--muted);text-align:center;margin:0">學員點開連結即可看到自己的完整數據報告</p>
-  </div>
-  <div style="display:flex;gap:9px" class="pb32">
-    <button class="btn bs" onclick="window.print()" style="flex:1;font-size:14px">🖨 列印報告</button>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin:0">學員點開連結即可查看完整評估報告與 InBody 數據</p>
   </div>
 </div>
 
@@ -1416,9 +1413,57 @@ function copyReportLink(){
   });
 }
 function shareReportLine(){
+  if(!SD)return;
   var url=getReportURL();
-  var name=SD&&SD.name?SD.name+'的':'您的';
-  window.open('https://line.me/R/msg/text/?'+encodeURIComponent('📊 '+name+'皮拉提斯體態評估報告\n點開連結查看完整數據：\n'+url));
+  var d=SD,s=SF||{};
+  var name=d.name||'您';
+  var g=d.gender||'女';
+  var age=s.staff_age||(d.age?d.age.replace(/[^0-9]/g,''):'');
+  var h=s.height,w=s.weight,bmi=s.bmi;
+  var fat=s.body_fat,mu=s.muscle,bmr=s.bmr_input,visc=s.visceral,ba=s.body_age;
+  var now=new Date();
+  var dateStr=now.getFullYear()+'/'+(now.getMonth()+1)+'/'+now.getDate();
+  var lines=[];
+  lines.push('🌸 嗨 '+name+' 你好');
+  lines.push('以下是你今天在昀姿優雅空間的體態評估結果');
+  lines.push('');
+  lines.push('📅 評估日期：'+dateStr);
+  lines.push('');
+  lines.push('📊 InBody 體態數據');
+  if(h) lines.push('身高：'+h+' cm');
+  if(w) lines.push('體重：'+w+' kg');
+  if(bmi){
+    var bs=bmiStatus(parseFloat(bmi));
+    lines.push('BMI：'+bmi+'（'+bs.t+'）');
+  }
+  if(fat){
+    var ageN=age?parseInt(age):30;
+    var fs=fatStatus(parseFloat(fat),g,ageN);
+    lines.push('體脂率：'+fat+'%（'+fs.t+'）');
+  }
+  if(mu){
+    var ageN2=age?parseInt(age):30;
+    var ms=muscleStatus(parseFloat(mu),g,ageN2);
+    lines.push('骨骼肌率：'+mu+'%（'+ms.t+'）');
+  }
+  if(bmr) lines.push('基礎代謝：'+bmr+' kcal');
+  if(visc){
+    var vs=visceralStatus(parseFloat(visc),g);
+    lines.push('內臟脂肪：'+visc+' 級（'+vs.t+'）');
+  }
+  if(ba) lines.push('身體年齡：'+ba+' 歲');
+  lines.push('');
+  if(d.goal&&d.goal.length){
+    lines.push('🎯 你的訓練目標：'+d.goal.join('、'));
+    lines.push('');
+  }
+  lines.push('📋 點開連結可查看完整評估報告與教練建議');
+  lines.push(url);
+  lines.push('');
+  lines.push('如有任何問題歡迎聯繫我們 有任何不清楚的地方隨時問我 🌿');
+  lines.push('昀姿優雅空間 敬上');
+  var msg=lines.join('\n');
+  window.open('https://line.me/R/msg/text/?'+encodeURIComponent(msg));
 }
 </script>
 </body>
