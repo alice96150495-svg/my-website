@@ -131,21 +131,39 @@
     .q-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
     .q-question{font-size:17px;font-weight:700;color:var(--text);margin-bottom:18px;line-height:1.5}
     @media print{
-      @page{size:A4 portrait;margin:12mm 14mm}
+      @page{size:A4 portrait;margin:14mm 16mm}
       *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-      body{background:#fff!important;font-size:13px}
-      .hd,.steps,.pb32,footer,[onclick],[style*="window.print"]{display:none!important}
+      body{background:#fff!important;font-size:12px;color:#333!important}
+      .hd,.steps,footer,[onclick]{display:none!important}
       button{display:none!important}
       #scr-student,#scr-success,#scr-staff{display:none!important}
       #scr-analysis{display:block!important}
       .wrap{max-width:100%!important;padding:0!important;margin:0!important}
-      .card{box-shadow:none!important;border:1px solid #ddd!important;margin-bottom:10px!important;padding:14px!important;page-break-inside:avoid}
-      .rpt-section{page-break-inside:avoid}
+      .card{box-shadow:none!important;border:none!important;padding:0!important;margin-bottom:0!important}
+      .rpt-section,div[style*="margin-bottom:20px"]{page-break-inside:avoid}
       .statbox{page-break-inside:avoid}
-      .rangeBar{page-break-inside:avoid}
-      h2{font-size:17px!important}
-      .statv{font-size:18px!important}
+      /* A4 列印頁首 */
+      #print-header{display:flex!important}
+      /* 隱藏分享列與螢幕標題 */
+      div[style*="background:rgba(122,158,126,.08)"]{display:none!important}
+      .screen-header{display:none!important}
+      #scr-analysis>button{display:none!important}
+      /* 範圍條縮小 */
+      .statv{font-size:16px!important}
+      .atitle{font-size:13px!important;padding:6px 0!important;margin-bottom:8px!important}
+      h2{font-size:16px!important}
     }
+    #print-header{
+      display:none;
+      justify-content:space-between;
+      align-items:center;
+      padding:0 0 10px;
+      border-bottom:2px solid #DDB8AE;
+      margin-bottom:14px;
+    }
+    #print-header .ph-title{font-size:15px;font-weight:700;color:#5A4040;letter-spacing:1px}
+    #print-header .ph-sub{font-size:11px;color:#A89090;margin-top:2px}
+    #print-header .ph-date{font-size:11px;color:#A89090;text-align:right}
   </style>
 </head>
 <body>
@@ -590,7 +608,16 @@
 <div class="wrap" id="scr-analysis" style="display:none">
   <button onclick="goBack('analysis')" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:6px 2px 10px;display:flex;align-items:center;gap:4px;font-family:inherit">‹ 上一頁</button>
   <div class="card">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
+    <!-- 列印專用頁首（螢幕隱藏，列印時顯示） -->
+    <div id="print-header">
+      <div>
+        <div class="ph-title">昀姿優雅空間　皮拉提斯體態評估報告</div>
+        <div class="ph-sub" id="print-student-info"></div>
+      </div>
+      <div class="ph-date" id="print-date"></div>
+    </div>
+    <!-- 螢幕標題 -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px" class="screen-header">
       <div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:4px">個人化評估報告</div>
         <h2 style="font-size:19px;font-weight:700" id="rpt-name"></h2>
@@ -1118,8 +1145,11 @@ function renderReport(){
   if(!SD) return;
   var d=SD,s=SF||{},g=d.gender||'女';
   var now=new Date();
+  var dateStr=now.getFullYear()+'/'+(now.getMonth()+1)+'/'+now.getDate();
   document.getElementById('rpt-name').textContent=(d.name||'學員')+' 的評估報告';
-  document.getElementById('rpt-date').innerHTML='評估日期<br>'+now.getFullYear()+'/'+(now.getMonth()+1)+'/'+now.getDate();
+  document.getElementById('rpt-date').innerHTML='評估日期<br>'+dateStr;
+  document.getElementById('print-student-info').textContent=(d.name||'')+(d.gender?' ．'+d.gender:'')+(age?' ．'+age+' 歲':'')+(d.phone?' ．'+d.phone:'');
+  document.getElementById('print-date').innerHTML='評估日期<br>'+dateStr;
 
   var h=parseFloat(s.height),w=parseFloat(s.weight);
   var fat=parseFloat(s.body_fat),mu=parseFloat(s.muscle);
@@ -1131,42 +1161,13 @@ function renderReport(){
   var idealWhi=h?Math.round(24*Math.pow(h/100,2)*10)/10:null;
   var html='';
 
-  // ─ 0. 學員基本資料 ──────────────────────
-  var srow=function(l,v){
-    if(!v||v===''||v==='undefined')return'';
-    return'<div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">'+
-      '<span style="color:var(--muted);min-width:90px;flex-shrink:0;font-size:12px">'+l+'</span>'+
-      '<span style="color:var(--text);font-weight:600;flex:1;line-height:1.5">'+v+'</span></div>';
-  };
-  html+='<div style="margin-bottom:20px"><div class="atitle">👤 學員填寫資料</div>'+
-
-  '<div style="border:1px solid var(--border);border-radius:12px;padding:4px 16px;margin-bottom:10px">'+
-  '<div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;padding:10px 0 4px">基本資料</div>'+
-  srow('姓名',d.name||'')+
-  srow('性別',d.gender||'')+
-  srow('年齡',d.age||'')+
-  srow('電話',d.phone||'')+
-  srow('Line / Email',d.line_email||'')+
-  srow('職業',d.occupation||'')+
-  srow('工作型態',(d.work_type||'')+(d.work_other?' — '+d.work_other:''))+
-  '</div>'+
-
-  '<div style="border:1px solid var(--border);border-radius:12px;padding:4px 16px;margin-bottom:10px">'+
-  '<div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;padding:10px 0 4px">健康狀況</div>'+
-  srow('醫療狀況',(d.medical&&d.medical.length&&d.medical[0]!==''?d.medical.join('、'):'以上皆無')+(d.medical_other?' — '+d.medical_other:''))+
-  srow('疼痛或不適',d.pain_desc||'無')+
-  srow('手術史',d.surg==='是'?'有'+(d.surg_desc?' — '+d.surg_desc:''):'無')+
-  '</div>'+
-
-  '<div style="border:1px solid var(--border);border-radius:12px;padding:4px 16px;margin-bottom:10px">'+
-  '<div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;padding:10px 0 4px">運動與目標</div>'+
-  srow('運動頻率',(d.exfreq||'')+(d.ex_type?' — '+d.ex_type:''))+
-  srow('皮拉提斯經驗',d.plexp||'')+
-  srow('上課目標',(d.goal&&d.goal.length?d.goal.join('、'):'')+(d.goal_area?' 　加強：'+d.goal_area:''))+
-  srow('訓練強度',d.intensity||'')+
-  srow('偏好時段',(d.sch&&d.sch.length?d.sch.join('、'):''))+
-  srow('其他資訊',d.other_info||'')+
-  '</div></div>';
+  // ─ 0. 學員資訊列（精簡版，A4 也會顯示） ─────
+  var infoChips='';
+  if(d.gender) infoChips+='<span style="background:var(--gl);color:var(--gd);padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600">'+d.gender+'</span> ';
+  if(d.age) infoChips+='<span style="background:var(--gl);color:var(--gd);padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600">'+d.age+'</span> ';
+  if(d.phone) infoChips+='<span style="color:var(--muted);font-size:12px">📞 '+d.phone+'</span>';
+  html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--cream);border-radius:10px;margin-bottom:16px;border:1px solid var(--border)">'+
+  infoChips+'</div>';
 
   // ─ 1. 體態數據總覽 ──────────────────────
   html+='<div style="background:var(--cream);border-radius:12px;padding:16px;margin-bottom:20px">'+
